@@ -1,0 +1,18 @@
+[package]
+name = "wisec_demo"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.62"
+async-channel = "1.7.1"
+axum = "0.5.15"
+chacha20poly1305 = "0.10.1"
+futures = "0.3"
+hex = "0.4.3"
+tokio = { version = "1", features = ["full"] }
+tower = { version = "0.4", features = ["util"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
