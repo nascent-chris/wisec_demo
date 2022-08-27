@@ -1,6 +1,6 @@
 # wisec_demo
 
-This is a Rust proof of concept demonstration of the security model proposed in the the [security assessment document](tdog_wireless_security_assesment.md).
+This is a Rust proof of concept demonstration of the security model proposed in the the [security recommendations document](tdog_wireless_security_assesment.md).
 
 To run, first [install rust](https://www.rust-lang.org/tools/install).  
 
