@@ -6,7 +6,7 @@ use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::Subs
 use anyhow::anyhow;
 use chacha20poly1305::consts::U12;
 use chacha20poly1305::{
-    aead::{generic_array::GenericArray, rand_core::RngCore, Aead, AeadCore, KeyInit, OsRng},
+    aead::{generic_array::GenericArray, rand_core::RngCore, Aead, KeyInit, OsRng},
     ChaCha20Poly1305, Nonce,
 };
 
@@ -24,7 +24,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
 
     // build a list of `Node`s and the corresponding `Sender<_>` objects that we will use to communicate with them
-    let txs = (0..5)
+    let txs = (0..10)
         .into_iter()
         .map(|id| {
             let (tx, rx) = async_channel::unbounded();
@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let nonce = generate_nonce(0xFF);
 
         let msg = b"plaintext message bruv";
-        let ciphertext = cipher.encrypt(&nonce.into(), msg.as_ref()).unwrap();
+        let ciphertext = cipher.encrypt(&nonce, msg.as_ref()).unwrap();
         tracing::info!(
             "ciphertext: {}, nonce: {}",
             hex::encode(&ciphertext),
@@ -54,7 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Send our ciphertext, along with the generated nonce, to all of the nodes
         for tx in txs.iter() {
-            tx.send((nonce.into(), ciphertext.to_vec())).await.unwrap();
+            tx.send((nonce, ciphertext.to_vec())).await.unwrap();
         }
         tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
     }
@@ -81,7 +81,7 @@ fn generate_nonce(chip_id: u8) -> Nonce {
     let id = chip_id;
 
     // First 6 bytes is timestamp
-    nonce_array[6..12].copy_from_slice(&timestamp_bits);
+    nonce_array[6..12].copy_from_slice(timestamp_bits);
     // Next 5 bytes is random
     nonce_array[1..6].copy_from_slice(&rand_bytes);
     // Final byte is the chip ID
